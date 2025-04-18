@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Gen Testcase App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatbot UI</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,18 +12,23 @@
     <div>Đang xử lý...</div>
   </div>
   <div id="errorMessage" class="error-message"></div>
-  <div class="container">
-    <div class="left">
-      <form id="myForm">
-        <textarea id="userInput" placeholder="Nhập nội dung..."></textarea>
+  <div class="chat-container">
+    <div class="chat-header">
+      <h2>Chatbot Assistant</h2>
+    </div>
+ 
+    <div class="chat-box">
+      <div class="messages" id="responseDisplay"></div>
+    </div>
+ 
+    <div class="chat-input">
+      <textarea id="userInput" placeholder="Nhập câu hỏi hoặc yêu cầu..."></textarea>
+      <div class="button-row">
         <button type="button" id="run_OpenAPI">RUN WITH OPENAI</button>
         <button type="button" id="run_GROQAPI">RUN WITH GROQ</button>
-      </form>
-    </div>
-    <div class="right">
-      <div id="responseDisplay" class="response-box"></div>
+      </div>
     </div>
   </div>
-  <script src="script.js"></script>
+ 
 </body>
 </html>
