@@ -14,13 +14,13 @@ document.getElementById('run_GROQAPI').addEventListener('click', async (event) =
 });
  
 document.addEventListener('click', function (event) {
-  if (event.target && event.target.classList.contains('exportBtn')) {
+  if (event.target?.classList.contains('exportBtn')) {
     exportToWord(event.target);
   }
 });
  
 document.addEventListener('click', function (event) {
-  if (event.target && event.target.classList.contains('exportTemplateBtn')) {
+  if (event.target?.classList.contains('exportTemplateBtn')) {
     const table = event.target.closest('.resultTable');
     if (!table) {
       showError("❌ Không tìm thấy bảng để export");
@@ -38,12 +38,6 @@ document.addEventListener('click', function (event) {
  
       headers.forEach((key, index) => {
         let value = cells[index]?.textContent.trim() || '';
- 
-        if (key === 'DataTest') {
-            value =value ;
-          }
-       
- 
         if (key === 'Steps') {
           value = value.split(',').map(step => step.trim()).filter(Boolean);
         }
@@ -57,13 +51,17 @@ document.addEventListener('click', function (event) {
     exportDocx(testCases); // ✅ Gửi dữ liệu đúng kiểu cho exportDocx
   }
 });
- 
+
+document.addEventListener('input', function (event) {
+  const userInput = document.getElementById('userInput').value;
+  const isEmpty = userInput.trim().length === 0;
+
+  document.getElementById('run_OpenAPI').disabled = isEmpty;
+  document.getElementById('run_GROQAPI').disabled = isEmpty;
+});
+
 async function handleAPIRequest(endpoint) {
- // event.preventDefault();
-  document.getElementById('run_OpenAPI').disabled = true;
-  document.getElementById('run_GROQAPI').disabled = true;
   document.getElementById('loadingOverlay').style.display = 'flex';
- 
   const userInput = document.getElementById('userInput').value;
   showUserMessage(userInput);
  
@@ -218,7 +216,7 @@ async function isTestCaseByAI(input) {
 }
 }
  
-async function exportToWord(button,filename = 'TestCases.doc') {
+async function exportToWord(button,filename = `TestCases_${getCurrentTimestamp()}.docx`) {
   const cssText = await fetch('/word-style.css').then(res => res.text());
   const header = `
     <html xmlns:o='urn:schemas-microsoft-com:office:office'
@@ -273,7 +271,6 @@ async function exportDocx(testCases) {
     }
     const buffer = await response.arrayBuffer();
     const zip = new PizZip(buffer);
- 
     // Tạo dữ liệu từ testCases
     const data = {
       testcases: testCases.map((tc, i) => ({
@@ -292,8 +289,7 @@ async function exportDocx(testCases) {
     const doc = new Docxtemplater(zip, {
       paragraphLoop: true,
       linebreaks: true
-    });
- 
+    }); 
     try {
       // Render file DOCX
       doc.render(data);
@@ -306,7 +302,7 @@ async function exportDocx(testCases) {
     // Lấy blob từ kết quả render
     const blob = doc.getZip().generate({ type: 'blob' });
     // Sử dụng FileSaver.js để download file
-    saveAs(blob, 'TestCases.docx');
+    saveAs(blob, `TestCases_${getCurrentTimestamp()}.docx`);
   } catch (error) {
     console.error('Lỗi khi xử lý exportDocx:', error);
     showError('❌ Lỗi khi xử lý file DOCX');
@@ -330,4 +326,16 @@ function showUserMessage(text) {
   msg.textContent = text;
   responseBox.appendChild(msg);
   responseBox.scrollTop = responseBox.scrollHeight;
+}
+
+function getCurrentTimestamp() {
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, '0'); // tháng bắt đầu từ 0
+  const dd = String(now.getDate()).padStart(2, '0');
+  const hh = String(now.getHours()).padStart(2, '0');
+  const mi = String(now.getMinutes()).padStart(2, '0');
+  const ss = String(now.getSeconds()).padStart(2, '0');
+  const currentTime = `${yyyy}${mm}${dd}${hh}${mi}${ss}`
+  return currentTime ;
 }
